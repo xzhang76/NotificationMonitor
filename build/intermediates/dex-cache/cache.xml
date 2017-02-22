@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/zhangxiaoting/Javawork/android-sdk-macosx-2/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67">
+        <dex dex="/Users/zhangxiaoting/Work/WebView/NotificationListenerDemo/app/build/intermediates/pre-dexed/debug/support-v4-19.1.0_6c849c5750d4927fa4ccf2aaa45ea7f2d85e4ae1.jar" />
+    </item>
+
+</items>
