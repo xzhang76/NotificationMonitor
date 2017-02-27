@@ -11,4 +11,10 @@
         <item quantity="other">%d active notifications</item>
     </plurals>
 
+    <string name="removed_notification_count_zero">No removed notification</string>
+    <plurals name="removed_notification_count_nonzero">
+        <item quantity="one">%d removed notification</item>
+        <item quantity="other">%d removed notifications</item>
+    </plurals>
+
 </resources>

@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,10 +28,12 @@ public class NotificationMonitor extends NotificationListenerService {
     private static final int EVENT_UPDATE_CURRENT_NOS = 0;
     public static final String ACTION_NLS_CONTROL = "com.seven.notificationlistenerdemo.NLSCONTROL";
     public static List<StatusBarNotification[]> mCurrentNotifications = new ArrayList<StatusBarNotification[]>();
+    public static List<StatusBarNotification> mRemovedNotifications = new ArrayList<StatusBarNotification>();
     public static int mCurrentNotificationsCounts = 0;
     public static StatusBarNotification mPostedNotification;
     public static StatusBarNotification mRemovedNotification;
     private CancelNotificationReceiver mReceiver = new CancelNotificationReceiver();
+    private SharedPreferences mPreference;
     // String a;
 
     private Handler mMonitorHandler = new Handler() {
@@ -77,6 +80,8 @@ public class NotificationMonitor extends NotificationListenerService {
         filter.addAction(ACTION_NLS_CONTROL);
         registerReceiver(mReceiver, filter);
         mMonitorHandler.sendMessage(mMonitorHandler.obtainMessage(EVENT_UPDATE_CURRENT_NOS));
+        mPreference = getApplicationContext().getSharedPreferences("REMOVED_NOTIFICATION", MODE_PRIVATE);
+
     }
 
     @Override
@@ -132,6 +137,11 @@ public class NotificationMonitor extends NotificationListenerService {
         logNLS("removed...");
         logNLS("have " + mCurrentNotificationsCounts + " active notifications");
         mRemovedNotification = sbn;
+        if ("com.lphtsccft1".equals(mRemovedNotification.getPackageName())) {
+            int count = mPreference.getInt("REMOVED_NOTIFICATION", 0);
+            mRemovedNotifications.add(mRemovedNotification);
+            mPreference.edit().putInt("REMOVED_NOTIFICATION", count+1).commit();
+        }
     }
 
     private void updateCurrentNotifications() {
@@ -146,6 +156,10 @@ public class NotificationMonitor extends NotificationListenerService {
             logNLS("Should not be here!!");
             e.printStackTrace();
         }
+    }
+
+    public static List<StatusBarNotification> getRemovedNotifications() {
+        return mRemovedNotifications;
     }
 
     public static StatusBarNotification[] getCurrentNotifications() {

@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +22,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.notificationlistenerdemo.R;
+
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -78,16 +81,17 @@ public class MainActivity extends Activity {
             case R.id.btnClearLastNotify:
                 logNLS("Clear Last notification...");
                 clearLastNotification();
-                mHandler.sendMessageDelayed(mHandler.obtainMessage(EVENT_LIST_CURRENT_NOS), 50);
+//                mHandler.sendMessageDelayed(mHandler.obtainMessage(EVENT_LIST_CURRENT_NOS), 50);
                 break;
             case R.id.btnClearAllNotify:
                 logNLS("Clear All notifications...");
                 clearAllNotifications();
-                mHandler.sendMessageDelayed(mHandler.obtainMessage(EVENT_LIST_CURRENT_NOS), 50);
+//                mHandler.sendMessageDelayed(mHandler.obtainMessage(EVENT_LIST_CURRENT_NOS), 50);
                 break;
             case R.id.btnListNotify:
-                logNLS("List notifications...");
-                listCurrentNotification();
+                logNLS("List notifications record...");
+//                listCurrentNotification();
+                listNotificationRecord();
                 break;
             case R.id.btnEnableUnEnableNotify:
                 logNLS("Enable/UnEnable notification...");
@@ -95,6 +99,34 @@ public class MainActivity extends Activity {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 列出所有删掉的notification
+     */
+    private void listNotificationRecord() {
+        String result = "";
+        int count = 0;
+        if (isEnabledNLS) {
+//            if (NotificationMonitor.getCurrentNotifications() == null) {
+//                logNLS("mCurrentNotifications.get(0) is null");
+//                return;
+//            }
+            int n = NotificationMonitor.mRemovedNotifications.size();
+            if (n == 0) {
+                result = getResources().getString(R.string.removed_notification_count_zero);
+            }else {
+                result = String.format(getResources().getQuantityString(R.plurals.removed_notification_count_nonzero, n, n));
+            }
+//            result = result + "\n" + getNotificationRecordListString();
+//            mTextView.setText(result);
+            SharedPreferences sp = getApplicationContext().getSharedPreferences("REMOVED_NOTIFICATION", MODE_PRIVATE);
+            count = sp.getInt("REMOVED_NOTIFICATION", 0);
+            mTextView.setText(count + " removed notifications");
+        }else {
+            mTextView.setTextColor(Color.RED);
+            mTextView.setText("Please Enable Notification Access");
         }
     }
 
@@ -138,6 +170,23 @@ public class MainActivity extends Activity {
         context.sendBroadcast(intent);
     }
 
+    private String getNotificationRecordListString() {
+        String listNos = "";
+        int length = 0;
+        List<StatusBarNotification> removedNotifications = NotificationMonitor.getRemovedNotifications();
+        if (removedNotifications != null) {
+            length = removedNotifications.size();
+        }
+        if (length!= 0) {
+            for (int i = 0; i < length; i++) {
+                StatusBarNotification notification = removedNotifications.get(i);
+                String tickerText = (String) notification.getNotification().tickerText;
+                listNos = "ticker text:" + tickerText +" " + notification.getPackageName() + "\n" + listNos;
+            }
+        }
+        return listNos;
+    }
+
     private String getCurrentNotificationString() {
         String listNos = "";
         StatusBarNotification[] currentNos = NotificationMonitor.getCurrentNotifications();
@@ -165,7 +214,7 @@ public class MainActivity extends Activity {
             result = result + "\n" + getCurrentNotificationString();
             mTextView.setText(result);
         }else {
-            mTextView.setTextColor(Color.RED);    
+            mTextView.setTextColor(Color.RED);
             mTextView.setText("Please Enable Notification Access");
         }
     }
